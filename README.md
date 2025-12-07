@@ -12,6 +12,8 @@ I transformed a PDF report into an interactive web dashboard using modern web te
 
 I took the initial PDF report ("Magic Worlds Oct - Nov Report.pdf") and pasted it into **Google Gemini Console** to extract structured data. The AI tool analyzed the PDF content and generated a comprehensive JSON file (`src/utils/report-data.json`) containing all metrics, social media performance data, and report metadata.
 
+![PDF to JSON Extraction using Google Gemini](./docs/gemini-extraction.png)
+
 ### Step 2: Project Setup
 
 I used **CursorAI IDE** to initialize a Next.js project with TypeScript and Tailwind CSS for styling. I designed the project structure to be modular with separate components for each visualization type.
