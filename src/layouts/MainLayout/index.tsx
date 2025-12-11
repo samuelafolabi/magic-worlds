@@ -7,6 +7,7 @@ interface MainLayoutProps {
   title?: string;
   description?: string;
   maxWidth?: "7xl" | "full";
+  headerRight?: ReactNode;
 }
 
 export default function MainLayout({
@@ -14,6 +15,7 @@ export default function MainLayout({
   title = "Magic Worlds",
   description = "Explore magical worlds and embark on incredible adventures",
   maxWidth = "7xl",
+  headerRight,
 }: MainLayoutProps) {
   const maxWidthClass = maxWidth === "full" ? "max-w-full" : "max-w-7xl";
   return (
@@ -41,6 +43,7 @@ export default function MainLayout({
                   className="h-10 w-auto"
                 />
               </div>
+              {headerRight && <div className="flex items-center gap-3">{headerRight}</div>}
             </div>
           </nav>
         </header>

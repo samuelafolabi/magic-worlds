@@ -1,7 +1,7 @@
 {
   "report_metadata": {
     "title": "Magic Worlds Monthly Report",
-    "period": "October - November 2025",
+    "period": "November 2025",
     "theme": "Play new worlds. Keep what you earn. Build your own.",
     "source_document": "Magic Worlds Oct - Nov Report.pdf"
   },
@@ -66,7 +66,11 @@
       "leaderboard_peak": 5890,
       "monthly_player_growth_factor": "1.14x"
     },
-    "visualization_suggestion": "List view for initiatives; Line chart for daily login trends."
+    "visualization_suggestion": "List view for initiatives; Line chart for daily login trends.",
+    "platform_behaviors": [],
+    "viral_loops": [],
+    "b2b_activity": [],
+    "player_sentiment_themes": []
   },
   "social_media_performance": {
     "platforms": [
@@ -109,7 +113,18 @@
         "role": "Conversation hub"
       }
     ],
-    "visualization_suggestion": "Bar chart comparing 'Growth %' across platforms. Pie chart for 'Share of Reach' by platform."
+    "visualization_suggestion": "Bar chart comparing 'Growth %' across platforms. Pie chart for 'Share of Reach' by platform.",
+    "interaction_increase_percentage": "",
+    "top_content_themes": [],
+    "notable_spikes": []
+  },
+  "top_world_performance": {
+    "top_worlds_ranked": [],
+    "population_shift": [],
+    "working_index_movement": [],
+    "engagement_lift": [],
+    "world_personality_reads": [],
+    "visualization_suggestion": "Heatmap or bar chart for world momentum."
   },
   "product_evolution": {
     "version": "V5",
@@ -120,7 +135,11 @@
       "Improved onboarding (Auto-login, revised tutorials)",
       "Live show integrations with Magic Bots"
     ],
-    "visualization_suggestion": "Timeline or Gantt chart showing feature rollout phases."
+    "visualization_suggestion": "Timeline or Gantt chart showing feature rollout phases.",
+    "top_products_by_growth": [],
+    "traction_features": [],
+    "usage_curves": [],
+    "emerging_products": []
   },
   "purpose_beyond_growth": {
     "focus_area": "Real-world Impact",
@@ -131,7 +150,11 @@
       "Funded local meetups"
     ],
     "philosophy": "Digital region supporting real people; Empathy unites the ecosystem.",
-    "visualization_suggestion": "Donation goal progress bar or map showing impact locations (e.g., Cebu)."
+    "visualization_suggestion": "Donation goal progress bar or map showing impact locations (e.g., Cebu).",
+    "impact_participation_growth": "",
+    "charity_and_community_achievements": [],
+    "player_driven_initiatives": [],
+    "impact_movement_expression": ""
   },
   "market_positioning": {
     "comparison": {
@@ -149,7 +172,28 @@
       }
     },
     "unique_value_prop": "Player-governed sovereign digital economy; participation is open; value is created by community, not bought.",
-    "visualization_suggestion": "Side-by-side comparison cards or Radar chart contrasting Growth, Community Sentiment, and Innovation."
+    "visualization_suggestion": "Side-by-side comparison cards or Radar chart contrasting Growth, Community Sentiment, and Innovation.",
+    "growth_indices": {
+      "happiness_longevity": {
+        "percentage_change": "",
+        "industry_comparison": []
+      },
+      "economy_size_sustainability": {
+        "economic_activity_growth_rate": "",
+        "sustainability_score_movement": ""
+      },
+      "population_working_index": {
+        "population_growth": "",
+        "productive_user_ratio_shift": "",
+        "industry_comparison": []
+      }
+    }
+  },
+  "key_events": {
+    "product_launches": [],
+    "world_updates": [],
+    "engagement_spikes": [],
+    "community_moments": []
   },
   "forward_outlook": {
     "strategic_goals": [
@@ -159,7 +203,11 @@
       "Expanding cross-cultural communication",
       "Enhancing bot-powered productivity"
     ],
-    "visualization_suggestion": "Roadmap list or 'Next Steps' checklist."
+    "visualization_suggestion": "Roadmap list or 'Next Steps' checklist.",
+    "momentum_indices": [],
+    "q1_predictions": [],
+    "worlds_to_watch": [],
+    "early_signals": []
   },
   "contact_info": {
     "website": "www.themagicworlds.com",

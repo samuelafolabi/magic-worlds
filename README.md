@@ -10,7 +10,7 @@ I transformed a PDF report into an interactive web dashboard using modern web te
 
 ### Step 1: Data Extraction (PDF → JSON)
 
-I took the initial PDF report ("Magic Worlds Oct - Nov Report.pdf") and pasted it into **Google Gemini Console** to extract structured data. The AI tool analyzed the PDF content and generated a comprehensive JSON file (`src/utils/report-data.json`) containing all metrics, social media performance data, and report metadata.
+I took the initial PDF report ("Magic Worlds Oct - Nov Report.pdf") and pasted it into **Google Gemini Console** to extract structured data. The AI tool analyzed the PDF content and generated JSON files (`src/utils/nov-report-data.json`, `src/utils/dec-report-data.json`) containing all metrics, social media performance data, and report metadata.
 
 ![PDF to JSON Extraction using Google Gemini](./docs/gemini-extraction.png)
 
@@ -37,11 +37,11 @@ I imported the JSON data file directly into the React components, allowing for e
 
 ## Current Data Update Process
 
-Currently, my dashboard uses a static JSON file (`src/utils/report-data.json`) as the data source. To update the dashboard with new report data, I would:
+Currently, my dashboard uses static JSON files (`src/utils/nov-report-data.json`, `src/utils/dec-report-data.json`) as the data sources. The UI includes a month/year selector that switches between available files. To update the dashboard with new report data, I would:
 
 1. **Extract New Data**: Process the new PDF report through Google Gemini Console (or similar AI tool) to generate an updated JSON file
-2. **Replace JSON File**: Update `src/utils/report-data.json` with the new data structure
-3. **Verify Data Structure**: Ensure the JSON maintains the same structure and field names as the existing file
+2. **Add or Replace JSON File**: Add a new month file under `src/utils/` (e.g., `jan-report-data.json`) following the same schema
+3. **Verify Data Structure**: Ensure the JSON maintains the same structure and field names as the existing files
 4. **Test Visualizations**: Run the development server and verify all charts and metrics display correctly with the new data
 
 I designed the dashboard components to automatically adapt to the data structure, so as long as the JSON schema remains consistent, no code changes are required for data updates.
@@ -136,10 +136,11 @@ magic-worlds/
 │   ├── layouts/              # Layout components
 │   │   └── MainLayout/
 │   ├── pages/                # Next.js pages
-│   │   └── index.tsx         # Main dashboard page
+│   │   └── index.tsx         # Main dashboard page with month/year selector
 │   ├── styles/               # Global styles
 │   └── utils/                # Utility files and data
-│       └── report-data.json  # Static data source
+│       ├── nov-report-data.json  # November static data source
+│       └── dec-report-data.json  # December static data source
 ├── public/                   # Static assets
 └── package.json              # Dependencies
 ```
