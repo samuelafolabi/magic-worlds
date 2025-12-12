@@ -15,7 +15,7 @@ export default function CursorTrail() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const mousePosRef = useRef({ x: 0, y: 0 });
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
