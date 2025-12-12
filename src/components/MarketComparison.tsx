@@ -61,13 +61,6 @@ export default function MarketComparison({ data }: MarketComparisonProps) {
           
           <div className="space-y-3">
             <div>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">Daily Actives</p>
-              <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-                {data.magic_worlds.daily_actives}
-              </p>
-            </div>
-            
-            <div>
               <p className="text-sm text-zinc-600 dark:text-zinc-400">Growth Trend</p>
               <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
                 {data.magic_worlds.growth_trend}
