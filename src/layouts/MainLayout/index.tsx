@@ -100,7 +100,7 @@ export default function MainLayout({
 
               {/* Connect */}
               <div>
-                <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
+                <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-4 capitalize">
                   Connect
                 </h3>
                 <ul className="space-y-2">
@@ -139,7 +139,7 @@ export default function MainLayout({
 
               {/* Community */}
               <div>
-                <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
+                <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-4 capitalize">
                   Community
                 </h3>
                 <ul className="space-y-2">

@@ -49,7 +49,7 @@ export default function SocialMediaChart({ data }: SocialMediaChartProps) {
             <span className="text-zinc-400">Growth: </span>
             {data.growth_percentage.toLocaleString()}%
             {data.isCapped && (
-              <span className="text-yellow-400 text-xs ml-2">(off-scale)</span>
+              <span className="text-yellow-400 text-sm ml-2">(off-scale)</span>
             )}
           </p>
         </div>
@@ -60,7 +60,7 @@ export default function SocialMediaChart({ data }: SocialMediaChartProps) {
 
   return (
     <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 p-6 shadow-lg">
-      <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">
+      <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-6 capitalize">
         Social Media Growth
       </h3>
       <ResponsiveContainer width="100%" height={300}>
@@ -69,11 +69,11 @@ export default function SocialMediaChart({ data }: SocialMediaChartProps) {
           <XAxis
             dataKey="platform"
             stroke="#6b7280"
-            style={{ fontSize: "12px" }}
+            style={{ fontSize: "14px" }}
           />
           <YAxis
             stroke="#6b7280"
-            style={{ fontSize: "12px" }}
+            style={{ fontSize: "14px" }}
             domain={yAxisDomain}
             tickFormatter={(value) => `${value}%`}
           />
@@ -92,7 +92,7 @@ export default function SocialMediaChart({ data }: SocialMediaChartProps) {
         </BarChart>
       </ResponsiveContainer>
       {chartData.some((item) => item.isCapped) && (
-        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2 text-center">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 text-center">
           * Instagram growth (7,300%) shown capped for scale comparison
         </p>
       )}

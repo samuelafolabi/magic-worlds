@@ -7,7 +7,7 @@ interface StrategicGoalsProps {
 export default function StrategicGoals({ goals }: StrategicGoalsProps) {
   return (
     <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 p-6 shadow-lg">
-      <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">
+      <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-6 capitalize">
         Strategic Goals
       </h3>
       

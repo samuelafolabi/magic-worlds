@@ -7,7 +7,7 @@ interface KeyEventsTimelineProps {
 export default function KeyEventsTimeline({ events }: KeyEventsTimelineProps) {
   return (
     <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 p-6 shadow-lg">
-      <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">
+      <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-6 capitalize">
         Key Events
       </h3>
       <div className="space-y-4">

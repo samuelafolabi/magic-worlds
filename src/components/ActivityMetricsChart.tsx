@@ -21,7 +21,7 @@ export default function ActivityMetricsChart({
 }: ActivityMetricsChartProps) {
   return (
     <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 p-6 shadow-lg">
-      <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">
+      <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-6 capitalize">
         Activity Metrics
       </h3>
       <ResponsiveContainer width="100%" height={300}>
@@ -36,9 +36,9 @@ export default function ActivityMetricsChart({
           <XAxis
             dataKey="name"
             stroke="#6b7280"
-            style={{ fontSize: "12px" }}
+            style={{ fontSize: "14px" }}
           />
-          <YAxis stroke="#6b7280" style={{ fontSize: "12px" }} />
+          <YAxis stroke="#6b7280" style={{ fontSize: "14px" }} />
           <Tooltip
             contentStyle={{
               backgroundColor: "#18181b",

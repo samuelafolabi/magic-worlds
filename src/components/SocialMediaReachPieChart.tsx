@@ -46,7 +46,7 @@ export default function SocialMediaReachPieChart({
             <span className="text-zinc-400">Reach: </span>
             {data.value.toLocaleString()}
           </p>
-          <p className="text-zinc-400 text-xs mt-1">
+          <p className="text-zinc-400 text-sm mt-1">
             {((data.payload.percent || 0) * 100).toFixed(1)}% of total
           </p>
         </div>
@@ -79,7 +79,7 @@ export default function SocialMediaReachPieChart({
         fill="#ffffff"
         textAnchor={x > cx ? "start" : "end"}
         dominantBaseline="central"
-        fontSize={12}
+        fontSize={14}
         fontWeight="600"
         style={{ textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}
       >
@@ -90,7 +90,7 @@ export default function SocialMediaReachPieChart({
 
   return (
     <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 p-6 shadow-lg">
-      <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">
+      <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-6 capitalize">
         Social Media Reach Distribution
       </h3>
       <ResponsiveContainer width="100%" height={300}>

@@ -28,7 +28,7 @@ export default function StatCard({
               {label}
             </p>
             {trend && (
-              <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+              <span className="inline-flex items-center gap-1 text-sm font-medium text-emerald-600 dark:text-emerald-400">
                 <svg
                   className="w-3 h-3"
                   fill="none"
