@@ -48,7 +48,9 @@ export default function Home() {
 
   const getMonthKeys = (year: string) => Object.keys(reportsByYear[year] ?? {});
   const defaultMonthList = getMonthKeys(defaultYear);
-  const defaultMonth = defaultMonthList[defaultMonthList.length - 1] || "";
+  const defaultMonth = defaultMonthList.includes("november")
+    ? "november"
+    : defaultMonthList[defaultMonthList.length - 1] || "";
 
   const [selectedYear, setSelectedYear] = useState(defaultYear);
   const [selectedMonth, setSelectedMonth] = useState(defaultMonth);
@@ -62,7 +64,9 @@ export default function Home() {
       return;
     }
     if (!months.includes(selectedMonth)) {
-      setSelectedMonth(months[months.length - 1]);
+      setSelectedMonth(
+        months.includes("november") ? "november" : months[months.length - 1]
+      );
     }
   }, [selectedYear, selectedMonth, defaultMonth]);
 
@@ -219,7 +223,7 @@ export default function Home() {
     >
       {/* Hero Section with Gradient Background */}
       <div className="mt-6" />
-      <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 -mt-8 mb-12 overflow-hidden rounded-b-3xl bg-gradient-to-br from-purple-600 via-pink-600 to-cyan-600 px-4 sm:px-6 lg:px-8 py-16">
+      <div className="relative -mx-4 sm:-mx-6 lg:-mx-8 -mt-8 mb-12 overflow-hidden rounded-b-3xl bg-gradient-to-br from-[#40b0bf] via-[#d2a64e] to-[#04d27f] px-4 sm:px-6 lg:px-8 py-16">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
 
@@ -308,7 +312,7 @@ export default function Home() {
                   type="button"
                   className={`w-full text-left px-5 py-3 cursor-pointer transition hover:bg-zinc-50 dark:hover:bg-zinc-800 ${
                     month.value === selectedMonth
-                      ? "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-200 font-semibold"
+                      ? "bg-[#40b0bf]/10 dark:bg-[#40b0bf]/20 text-[#40b0bf] dark:text-[#40b0bf]/80 font-semibold"
                       : "text-zinc-800 dark:text-zinc-100"
                   }`}
                   onClick={() => handleMonthSelect(month.value)}
@@ -362,7 +366,7 @@ export default function Home() {
                   type="button"
                   className={`w-full text-left px-5 py-3 cursor-pointer transition hover:bg-zinc-50 dark:hover:bg-zinc-800 ${
                     year === selectedYear
-                      ? "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-200 font-semibold"
+                      ? "bg-[#40b0bf]/10 dark:bg-[#40b0bf]/20 text-[#40b0bf] dark:text-[#40b0bf]/80 font-semibold"
                       : "text-zinc-800 dark:text-zinc-100"
                   }`}
                   onClick={() => handleYearSelect(year)}
@@ -399,7 +403,7 @@ export default function Home() {
                   {reportData.executive_snapshot.biggest_percentage_lifts.map(
                     (item, index) => (
                       <li key={index} className="flex items-start gap-2">
-                        <span className="mt-1 h-2 w-2 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500" />
+                        <span className="mt-1 h-2 w-2 rounded-full bg-gradient-to-r from-[#40b0bf] to-[#04d27f]" />
                         <span>{item}</span>
                       </li>
                     )
@@ -423,7 +427,7 @@ export default function Home() {
                     {reportData.executive_snapshot.fastest_growing_indices.map(
                       (item, index) => (
                         <li key={index} className="flex items-start gap-2">
-                          <span className="mt-1 h-2 w-2 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500" />
+                          <span className="mt-1 h-2 w-2 rounded-full bg-gradient-to-r from-[#40b0bf] to-[#04d27f]" />
                           <span>{item}</span>
                         </li>
                       )
@@ -560,63 +564,6 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          <div className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 p-4 shadow-sm">
-            <p className="text-xs text-zinc-600 dark:text-zinc-400 mb-1">
-              Creator/Player Interactions
-            </p>
-            <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-              {reportData.social_media_performance
-                .interaction_increase_percentage || "—"}
-            </p>
-          </div>
-          <div className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 p-4 shadow-sm">
-            <p className="text-xs text-zinc-600 dark:text-zinc-400 mb-1">
-              Top Content Themes
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {reportData.social_media_performance.top_content_themes
-                ?.length ? (
-                reportData.social_media_performance.top_content_themes.map(
-                  (theme, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-xs text-zinc-700 dark:text-zinc-300"
-                    >
-                      {theme}
-                    </span>
-                  )
-                )
-              ) : (
-                <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                  No themes yet.
-                </span>
-              )}
-            </div>
-          </div>
-          <div className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 p-4 shadow-sm">
-            <p className="text-xs text-zinc-600 dark:text-zinc-400 mb-1">
-              Notable Spikes
-            </p>
-            <div className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-              {reportData.social_media_performance.notable_spikes?.length ? (
-                reportData.social_media_performance.notable_spikes.map(
-                  (item, index) => (
-                    <div key={index} className="flex gap-2 items-start">
-                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                      <span>{item}</span>
-                    </div>
-                  )
-                )
-              ) : (
-                <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                  No spikes recorded.
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <SocialMediaChart data={socialMediaData} />
           <SocialMediaReachPieChart
@@ -642,12 +589,12 @@ export default function Home() {
                       {platform.handle}
                     </p>
                     {platform.role && (
-                      <p className="text-xs text-purple-600 dark:text-purple-400 mt-1 italic">
+                      <p className="text-xs text-[#40b0bf] dark:text-[#40b0bf]/80 mt-1 italic">
                         {platform.role}
                       </p>
                     )}
                   </div>
-                  <div className="rounded-lg bg-gradient-to-br from-purple-500 via-pink-500 to-cyan-500 p-2 shadow-lg shadow-purple-500/30">
+                  <div className="rounded-lg bg-gradient-to-br from-[#40b0bf] via-[#d2a64e] to-[#04d27f] p-2 shadow-lg shadow-[#40b0bf]/30">
                     <svg
                       className="w-4 h-4 text-white"
                       fill="currentColor"
@@ -660,7 +607,7 @@ export default function Home() {
 
                 <div className="space-y-2">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600 bg-clip-text text-transparent">
+                    <span className="text-2xl font-bold bg-gradient-to-r from-[#40b0bf] via-[#d2a64e] to-[#04d27f] bg-clip-text text-transparent">
                       {`${formatNumber(platform.growth_percentage)}%`}
                     </span>
                     <span className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -772,131 +719,133 @@ export default function Home() {
       </section>
 
       {/* Top World Performance */}
-      <section className="mb-16">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-              Top World Performance
-            </h2>
-            <p className="text-zinc-600 dark:text-zinc-400 mt-1">
-              Growth momentum and engagement across worlds
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 p-6 shadow-lg">
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
-              Ranked Growth
-            </h3>
-            {reportData.top_world_performance.top_worlds_ranked.length ? (
-              <ol className="space-y-3 text-sm text-zinc-700 dark:text-zinc-300 list-decimal list-inside">
-                {reportData.top_world_performance.top_worlds_ranked.map(
-                  (item, index) => (
-                    <li key={index}>{item}</li>
-                  )
-                )}
-              </ol>
-            ) : (
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                No rankings yet.
-              </p>
-            )}
-          </div>
-
-          <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 p-6 shadow-lg space-y-4">
+      {selectedMonth !== "november" && (
+        <section className="mb-16">
+          <div className="flex items-center justify-between mb-8">
             <div>
-              <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-1">
-                Population Shift
+              <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+                Top World Performance
+              </h2>
+              <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+                Growth momentum and engagement across worlds
               </p>
-              <div className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-                {reportData.top_world_performance.population_shift.length ? (
-                  reportData.top_world_performance.population_shift.map(
-                    (item, index) => (
-                      <div key={index} className="flex items-start gap-2">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-purple-500" />
-                        <span>{item}</span>
-                      </div>
-                    )
-                  )
-                ) : (
-                  <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                    No data yet.
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-1">
-                Working Index Movement
-              </p>
-              <div className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-                {reportData.top_world_performance.working_index_movement
-                  .length ? (
-                  reportData.top_world_performance.working_index_movement.map(
-                    (item, index) => (
-                      <div key={index} className="flex items-start gap-2">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-cyan-500" />
-                        <span>{item}</span>
-                      </div>
-                    )
-                  )
-                ) : (
-                  <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                    No data yet.
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-1">
-                Engagement Lift
-              </p>
-              <div className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-                {reportData.top_world_performance.engagement_lift.length ? (
-                  reportData.top_world_performance.engagement_lift.map(
-                    (item, index) => (
-                      <div key={index} className="flex items-start gap-2">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                        <span>{item}</span>
-                      </div>
-                    )
-                  )
-                ) : (
-                  <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                    No data yet.
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-1">
-                Personality Reads
-              </p>
-              <div className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-                {reportData.top_world_performance.world_personality_reads
-                  .length ? (
-                  reportData.top_world_performance.world_personality_reads.map(
-                    (item, index) => (
-                      <div key={index} className="flex items-start gap-2">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-pink-500" />
-                        <span>{item}</span>
-                      </div>
-                    )
-                  )
-                ) : (
-                  <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                    No reads yet.
-                  </span>
-                )}
-              </div>
             </div>
           </div>
-        </div>
-      </section>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 p-6 shadow-lg">
+              <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
+                Ranked Growth
+              </h3>
+              {reportData.top_world_performance.top_worlds_ranked.length ? (
+                <ol className="space-y-3 text-sm text-zinc-700 dark:text-zinc-300 list-decimal list-inside">
+                  {reportData.top_world_performance.top_worlds_ranked.map(
+                    (item, index) => (
+                      <li key={index}>{item}</li>
+                    )
+                  )}
+                </ol>
+              ) : (
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  No rankings yet.
+                </p>
+              )}
+            </div>
+
+            <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 p-6 shadow-lg space-y-4">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-1">
+                  Population Shift
+                </p>
+                <div className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+                  {reportData.top_world_performance.population_shift.length ? (
+                    reportData.top_world_performance.population_shift.map(
+                      (item, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#40b0bf]" />
+                          <span>{item}</span>
+                        </div>
+                      )
+                    )
+                  ) : (
+                    <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                      No data yet.
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-1">
+                  Working Index Movement
+                </p>
+                <div className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+                  {reportData.top_world_performance.working_index_movement
+                    .length ? (
+                    reportData.top_world_performance.working_index_movement.map(
+                      (item, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#04d27f]" />
+                          <span>{item}</span>
+                        </div>
+                      )
+                    )
+                  ) : (
+                    <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                      No data yet.
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-1">
+                  Engagement Lift
+                </p>
+                <div className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+                  {reportData.top_world_performance.engagement_lift.length ? (
+                    reportData.top_world_performance.engagement_lift.map(
+                      (item, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                          <span>{item}</span>
+                        </div>
+                      )
+                    )
+                  ) : (
+                    <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                      No data yet.
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-1">
+                  Personality Reads
+                </p>
+                <div className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+                  {reportData.top_world_performance.world_personality_reads
+                    .length ? (
+                    reportData.top_world_performance.world_personality_reads.map(
+                      (item, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#d2a64e]" />
+                          <span>{item}</span>
+                        </div>
+                      )
+                    )
+                  ) : (
+                    <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                      No reads yet.
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Two Column Layout: Market Positioning & Key Events */}
       <section className="mb-16">
@@ -913,77 +862,23 @@ export default function Home() {
           />
         </div>
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 p-5 shadow-sm">
-            <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
-              Happiness / Longevity
-            </p>
-            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
-              {reportData.market_positioning.growth_indices.happiness_longevity
-                .percentage_change || "—"}
-            </p>
-            <div className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-              {reportData.market_positioning.growth_indices.happiness_longevity
-                .industry_comparison.length ? (
-                reportData.market_positioning.growth_indices.happiness_longevity.industry_comparison.map(
-                  (item, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-purple-500" />
-                      <span>{item}</span>
-                    </div>
-                  )
-                )
-              ) : (
-                <span className="text-zinc-500 dark:text-zinc-400 text-sm">
-                  No comparisons yet.
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 p-5 shadow-sm">
-            <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
-              Economy Size / Sustainability
-            </p>
-            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
-              {reportData.market_positioning.growth_indices
-                .economy_size_sustainability.economic_activity_growth_rate ||
-                "—"}
-            </p>
-            <p className="text-sm text-zinc-700 dark:text-zinc-300">
-              {reportData.market_positioning.growth_indices
-                .economy_size_sustainability.sustainability_score_movement ||
-                "Awaiting update."}
-            </p>
-          </div>
-
-          <div className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 p-5 shadow-sm">
-            <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
-              Population / Working Index
-            </p>
-            <div className="space-y-2 text-sm text-zinc-700 dark:text-zinc-300">
-              <div className="flex items-center justify-between">
-                <span>Population Growth</span>
-                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
-                  {reportData.market_positioning.growth_indices
-                    .population_working_index.population_growth || "—"}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Productive-user Shift</span>
-                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
-                  {reportData.market_positioning.growth_indices
-                    .population_working_index.productive_user_ratio_shift ||
-                    "—"}
-                </span>
-              </div>
-              <div className="space-y-1">
+        {selectedMonth?.toLowerCase() !== "november" && (
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 p-5 shadow-sm">
+              <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
+                Happiness / Longevity
+              </p>
+              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
                 {reportData.market_positioning.growth_indices
-                  .population_working_index.industry_comparison.length ? (
-                  reportData.market_positioning.growth_indices.population_working_index.industry_comparison.map(
+                  .happiness_longevity.percentage_change || "—"}
+              </p>
+              <div className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+                {reportData.market_positioning.growth_indices
+                  .happiness_longevity.industry_comparison.length ? (
+                  reportData.market_positioning.growth_indices.happiness_longevity.industry_comparison.map(
                     (item, index) => (
                       <div key={index} className="flex items-start gap-2">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-cyan-500" />
+                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#40b0bf]" />
                         <span>{item}</span>
                       </div>
                     )
@@ -995,8 +890,64 @@ export default function Home() {
                 )}
               </div>
             </div>
+
+            <div className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 p-5 shadow-sm">
+              <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
+                Economy Size / Sustainability
+              </p>
+              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
+                {reportData.market_positioning.growth_indices
+                  .economy_size_sustainability.economic_activity_growth_rate ||
+                  "—"}
+              </p>
+              <p className="text-sm text-zinc-700 dark:text-zinc-300">
+                {reportData.market_positioning.growth_indices
+                  .economy_size_sustainability.sustainability_score_movement ||
+                  "Awaiting update."}
+              </p>
+            </div>
+
+            <div className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 p-5 shadow-sm">
+              <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
+                Population / Working Index
+              </p>
+              <div className="space-y-2 text-sm text-zinc-700 dark:text-zinc-300">
+                <div className="flex items-center justify-between">
+                  <span>Population Growth</span>
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                    {reportData.market_positioning.growth_indices
+                      .population_working_index.population_growth || "—"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Productive-user Shift</span>
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                    {reportData.market_positioning.growth_indices
+                      .population_working_index.productive_user_ratio_shift ||
+                      "—"}
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  {reportData.market_positioning.growth_indices
+                    .population_working_index.industry_comparison.length ? (
+                    reportData.market_positioning.growth_indices.population_working_index.industry_comparison.map(
+                      (item, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#04d27f]" />
+                          <span>{item}</span>
+                        </div>
+                      )
+                    )
+                  ) : (
+                    <span className="text-zinc-500 dark:text-zinc-400 text-sm">
+                      No comparisons yet.
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </section>
 
       {/* Drivers of Growth */}
@@ -1020,11 +971,11 @@ export default function Home() {
                   key={index}
                   className="group relative overflow-hidden rounded-xl bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-800 dark:to-zinc-900 p-6 hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
                 >
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#40b0bf]/10 to-[#04d27f]/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
 
                   <div className="relative z-10">
                     <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 via-pink-500 to-cyan-500 flex items-center justify-center text-white font-bold shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform duration-300">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-[#40b0bf] via-[#d2a64e] to-[#04d27f] flex items-center justify-center text-white font-bold shadow-lg shadow-[#40b0bf]/30 group-hover:scale-110 transition-transform duration-300">
                         {initiative.category.charAt(0)}
                       </div>
                       <div className="flex-1">
@@ -1042,95 +993,97 @@ export default function Home() {
             )}
           </div>
 
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="rounded-xl bg-zinc-50 dark:bg-zinc-800/50 p-4 border border-zinc-200/50 dark:border-zinc-700/50">
-              <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
-                Platform Behaviors
-              </p>
-              {reportData.drivers_of_growth.platform_behaviors.length ? (
-                <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-                  {reportData.drivers_of_growth.platform_behaviors.map(
-                    (item, index) => (
-                      <li key={index} className="flex gap-2 items-start">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-purple-500" />
-                        <span>{item}</span>
-                      </li>
-                    )
-                  )}
-                </ul>
-              ) : (
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  No entries yet.
+          {selectedMonth?.toLowerCase() !== "november" && (
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="rounded-xl bg-zinc-50 dark:bg-zinc-800/50 p-4 border border-zinc-200/50 dark:border-zinc-700/50">
+                <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
+                  Platform Behaviors
                 </p>
-              )}
-            </div>
+                {reportData.drivers_of_growth.platform_behaviors.length ? (
+                  <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+                    {reportData.drivers_of_growth.platform_behaviors.map(
+                      (item, index) => (
+                        <li key={index} className="flex gap-2 items-start">
+                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#40b0bf]" />
+                          <span>{item}</span>
+                        </li>
+                      )
+                    )}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    No entries yet.
+                  </p>
+                )}
+              </div>
 
-            <div className="rounded-xl bg-zinc-50 dark:bg-zinc-800/50 p-4 border border-zinc-200/50 dark:border-zinc-700/50">
-              <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
-                Viral Loops & Social
-              </p>
-              {reportData.drivers_of_growth.viral_loops.length ? (
-                <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-                  {reportData.drivers_of_growth.viral_loops.map(
-                    (item, index) => (
-                      <li key={index} className="flex gap-2 items-start">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-pink-500" />
-                        <span>{item}</span>
-                      </li>
-                    )
-                  )}
-                </ul>
-              ) : (
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  No entries yet.
+              <div className="rounded-xl bg-zinc-50 dark:bg-zinc-800/50 p-4 border border-zinc-200/50 dark:border-zinc-700/50">
+                <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
+                  Viral Loops & Social
                 </p>
-              )}
-            </div>
+                {reportData.drivers_of_growth.viral_loops.length ? (
+                  <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+                    {reportData.drivers_of_growth.viral_loops.map(
+                      (item, index) => (
+                        <li key={index} className="flex gap-2 items-start">
+                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#d2a64e]" />
+                          <span>{item}</span>
+                        </li>
+                      )
+                    )}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    No entries yet.
+                  </p>
+                )}
+              </div>
 
-            <div className="rounded-xl bg-zinc-50 dark:bg-zinc-800/50 p-4 border border-zinc-200/50 dark:border-zinc-700/50">
-              <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
-                B2B Activity
-              </p>
-              {reportData.drivers_of_growth.b2b_activity.length ? (
-                <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-                  {reportData.drivers_of_growth.b2b_activity.map(
-                    (item, index) => (
-                      <li key={index} className="flex gap-2 items-start">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-cyan-500" />
-                        <span>{item}</span>
-                      </li>
-                    )
-                  )}
-                </ul>
-              ) : (
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  No entries yet.
+              <div className="rounded-xl bg-zinc-50 dark:bg-zinc-800/50 p-4 border border-zinc-200/50 dark:border-zinc-700/50">
+                <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
+                  B2B Activity
                 </p>
-              )}
-            </div>
+                {reportData.drivers_of_growth.b2b_activity.length ? (
+                  <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+                    {reportData.drivers_of_growth.b2b_activity.map(
+                      (item, index) => (
+                        <li key={index} className="flex gap-2 items-start">
+                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#04d27f]" />
+                          <span>{item}</span>
+                        </li>
+                      )
+                    )}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    No entries yet.
+                  </p>
+                )}
+              </div>
 
-            <div className="rounded-xl bg-zinc-50 dark:bg-zinc-800/50 p-4 border border-zinc-200/50 dark:border-zinc-700/50">
-              <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
-                Player Sentiment
-              </p>
-              {reportData.drivers_of_growth.player_sentiment_themes.length ? (
-                <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-                  {reportData.drivers_of_growth.player_sentiment_themes.map(
-                    (item, index) => (
-                      <li key={index} className="flex gap-2 items-start">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                        <span>{item}</span>
-                      </li>
-                    )
-                  )}
-                </ul>
-              ) : (
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  No entries yet.
+              <div className="rounded-xl bg-zinc-50 dark:bg-zinc-800/50 p-4 border border-zinc-200/50 dark:border-zinc-700/50">
+                <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
+                  Player Sentiment
                 </p>
-              )}
+                {reportData.drivers_of_growth.player_sentiment_themes.length ? (
+                  <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+                    {reportData.drivers_of_growth.player_sentiment_themes.map(
+                      (item, index) => (
+                        <li key={index} className="flex gap-2 items-start">
+                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                          <span>{item}</span>
+                        </li>
+                      )
+                    )}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    No entries yet.
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -1140,7 +1093,7 @@ export default function Home() {
           {/* Product Evolution */}
           <div className="lg:col-span-2 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 p-8 shadow-lg">
             <div className="flex items-center gap-3 mb-6">
-              <div className="rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-cyan-500 p-3 shadow-lg shadow-purple-500/30">
+              <div className="rounded-full bg-gradient-to-br from-[#40b0bf] via-[#d2a64e] to-[#04d27f] p-3 shadow-lg shadow-[#40b0bf]/30">
                 <svg
                   className="w-6 h-6 text-white"
                   fill="none"
@@ -1172,7 +1125,7 @@ export default function Home() {
                     key={index}
                     className="flex items-start gap-3 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors duration-200"
                   >
-                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold mt-0.5">
+                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-r from-[#40b0bf] to-[#04d27f] flex items-center justify-center text-white text-xs font-bold mt-0.5">
                       {index + 1}
                     </div>
                     <p className="flex-1 text-sm text-zinc-700 dark:text-zinc-300">
@@ -1183,104 +1136,109 @@ export default function Home() {
               )}
             </div>
 
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 bg-white dark:bg-zinc-900">
-                <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
-                  Top Products by Growth
-                </p>
-                {reportData.product_evolution.top_products_by_growth.length ? (
-                  <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-                    {reportData.product_evolution.top_products_by_growth.map(
-                      (item, index) => (
-                        <li key={index} className="flex gap-2 items-start">
-                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                          <span>{item}</span>
-                        </li>
-                      )
+            {selectedMonth?.toLowerCase() !== "november" && (
+              <>
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 bg-white dark:bg-zinc-900">
+                    <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
+                      Top Products by Growth
+                    </p>
+                    {reportData.product_evolution.top_products_by_growth
+                      .length ? (
+                      <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+                        {reportData.product_evolution.top_products_by_growth.map(
+                          (item, index) => (
+                            <li key={index} className="flex gap-2 items-start">
+                              <span className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                              <span>{item}</span>
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                        No entries yet.
+                      </p>
                     )}
-                  </ul>
-                ) : (
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    No entries yet.
-                  </p>
-                )}
-              </div>
+                  </div>
 
-              <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 bg-white dark:bg-zinc-900">
-                <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
-                  Features Gaining Traction
-                </p>
-                {reportData.product_evolution.traction_features.length ? (
-                  <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-                    {reportData.product_evolution.traction_features.map(
-                      (item, index) => (
-                        <li key={index} className="flex gap-2 items-start">
-                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-purple-500" />
-                          <span>{item}</span>
-                        </li>
-                      )
+                  <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 bg-white dark:bg-zinc-900">
+                    <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
+                      Features Gaining Traction
+                    </p>
+                    {reportData.product_evolution.traction_features.length ? (
+                      <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+                        {reportData.product_evolution.traction_features.map(
+                          (item, index) => (
+                            <li key={index} className="flex gap-2 items-start">
+                              <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#40b0bf]" />
+                              <span>{item}</span>
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                        No entries yet.
+                      </p>
                     )}
-                  </ul>
-                ) : (
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    No entries yet.
-                  </p>
-                )}
-              </div>
-            </div>
+                  </div>
+                </div>
 
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 bg-white dark:bg-zinc-900">
-                <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
-                  Usage Curves
-                </p>
-                {reportData.product_evolution.usage_curves.length ? (
-                  <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-                    {reportData.product_evolution.usage_curves.map(
-                      (item, index) => (
-                        <li key={index} className="flex gap-2 items-start">
-                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-cyan-500" />
-                          <span>{item}</span>
-                        </li>
-                      )
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 bg-white dark:bg-zinc-900">
+                    <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
+                      Usage Curves
+                    </p>
+                    {reportData.product_evolution.usage_curves.length ? (
+                      <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+                        {reportData.product_evolution.usage_curves.map(
+                          (item, index) => (
+                            <li key={index} className="flex gap-2 items-start">
+                              <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#04d27f]" />
+                              <span>{item}</span>
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                        No entries yet.
+                      </p>
                     )}
-                  </ul>
-                ) : (
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    No entries yet.
-                  </p>
-                )}
-              </div>
+                  </div>
 
-              <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 bg-white dark:bg-zinc-900">
-                <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
-                  Emerging / Beta Products
-                </p>
-                {reportData.product_evolution.emerging_products.length ? (
-                  <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-                    {reportData.product_evolution.emerging_products.map(
-                      (item, index) => (
-                        <li key={index} className="flex gap-2 items-start">
-                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-amber-500" />
-                          <span>{item}</span>
-                        </li>
-                      )
+                  <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 bg-white dark:bg-zinc-900">
+                    <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-2">
+                      Emerging / Beta Products
+                    </p>
+                    {reportData.product_evolution.emerging_products.length ? (
+                      <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+                        {reportData.product_evolution.emerging_products.map(
+                          (item, index) => (
+                            <li key={index} className="flex gap-2 items-start">
+                              <span className="mt-1 h-1.5 w-1.5 rounded-full bg-amber-500" />
+                              <span>{item}</span>
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                        No entries yet.
+                      </p>
                     )}
-                  </ul>
-                ) : (
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    No entries yet.
-                  </p>
-                )}
-              </div>
-            </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Purpose Beyond Growth */}
-          <div className="rounded-2xl bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-cyan-500/10 border-2 border-purple-500/20 dark:border-purple-500/30 p-8 shadow-lg">
+          <div className="rounded-2xl bg-gradient-to-br from-[#40b0bf]/10 via-[#d2a64e]/10 to-[#04d27f]/10 border-2 border-[#40b0bf]/20 dark:border-[#40b0bf]/30 p-8 shadow-lg">
             <div className="flex items-center gap-2 mb-6">
               <svg
-                className="w-6 h-6 text-purple-600"
+                className="w-6 h-6 text-[#40b0bf]"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -1302,7 +1260,7 @@ export default function Home() {
                 <p className="text-xs text-zinc-600 dark:text-zinc-400 mb-1 uppercase tracking-wide">
                   Focus Area
                 </p>
-                <p className="text-lg font-semibold bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600 bg-clip-text text-transparent">
+                <p className="text-lg font-semibold bg-gradient-to-r from-[#40b0bf] via-[#d2a64e] to-[#04d27f] bg-clip-text text-transparent">
                   {reportData.purpose_beyond_growth.focus_area}
                 </p>
               </div>
@@ -1395,7 +1353,7 @@ export default function Home() {
                       reportData.purpose_beyond_growth.player_driven_initiatives.map(
                         (item, index) => (
                           <div key={index} className="flex gap-2 items-start">
-                            <span className="mt-1 h-1.5 w-1.5 rounded-full bg-purple-500" />
+                            <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#40b0bf]" />
                             <span>{item}</span>
                           </div>
                         )
@@ -1436,104 +1394,106 @@ export default function Home() {
             />
           </div>
 
-          <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 p-6 shadow-lg space-y-4">
-            <div>
-              <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-1">
-                Momentum Indices
-              </p>
-              {reportData.forward_outlook.momentum_indices.length ? (
-                <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-                  {reportData.forward_outlook.momentum_indices.map(
-                    (item, index) => (
-                      <li key={index} className="flex gap-2 items-start">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-purple-500" />
-                        <span>{item}</span>
-                      </li>
-                    )
-                  )}
-                </ul>
-              ) : (
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  No momentum signals yet.
+          {selectedMonth?.toLowerCase() !== "november" && (
+            <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 p-6 shadow-lg space-y-4">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-1">
+                  Momentum Indices
                 </p>
-              )}
-            </div>
+                {reportData.forward_outlook.momentum_indices.length ? (
+                  <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+                    {reportData.forward_outlook.momentum_indices.map(
+                      (item, index) => (
+                        <li key={index} className="flex gap-2 items-start">
+                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#40b0bf]" />
+                          <span>{item}</span>
+                        </li>
+                      )
+                    )}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    No momentum signals yet.
+                  </p>
+                )}
+              </div>
 
-            <div>
-              <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-1">
-                Q1 Predictions
-              </p>
-              {reportData.forward_outlook.q1_predictions.length ? (
-                <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-                  {reportData.forward_outlook.q1_predictions.map(
-                    (item, index) => (
-                      <li key={index} className="flex gap-2 items-start">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-cyan-500" />
-                        <span>{item}</span>
-                      </li>
-                    )
-                  )}
-                </ul>
-              ) : (
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  No predictions yet.
+              <div>
+                <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-1">
+                  Q1 Predictions
                 </p>
-              )}
-            </div>
+                {reportData.forward_outlook.q1_predictions.length ? (
+                  <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+                    {reportData.forward_outlook.q1_predictions.map(
+                      (item, index) => (
+                        <li key={index} className="flex gap-2 items-start">
+                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#04d27f]" />
+                          <span>{item}</span>
+                        </li>
+                      )
+                    )}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    No predictions yet.
+                  </p>
+                )}
+              </div>
 
-            <div>
-              <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-1">
-                Worlds to Watch
-              </p>
-              {reportData.forward_outlook.worlds_to_watch.length ? (
-                <div className="flex flex-wrap gap-2">
-                  {reportData.forward_outlook.worlds_to_watch.map(
-                    (item, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300"
-                      >
-                        {item}
-                      </span>
-                    )
-                  )}
-                </div>
-              ) : (
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  No watchlist yet.
+              <div>
+                <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-1">
+                  Worlds to Watch
                 </p>
-              )}
-            </div>
+                {reportData.forward_outlook.worlds_to_watch.length ? (
+                  <div className="flex flex-wrap gap-2">
+                    {reportData.forward_outlook.worlds_to_watch.map(
+                      (item, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300"
+                        >
+                          {item}
+                        </span>
+                      )
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    No watchlist yet.
+                  </p>
+                )}
+              </div>
 
-            <div>
-              <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-1">
-                Early Signals
-              </p>
-              {reportData.forward_outlook.early_signals.length ? (
-                <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
-                  {reportData.forward_outlook.early_signals.map(
-                    (item, index) => (
-                      <li key={index} className="flex gap-2 items-start">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-amber-500" />
-                        <span>{item}</span>
-                      </li>
-                    )
-                  )}
-                </ul>
-              ) : (
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  No signals yet.
+              <div>
+                <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400 mb-1">
+                  Early Signals
                 </p>
-              )}
+                {reportData.forward_outlook.early_signals.length ? (
+                  <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+                    {reportData.forward_outlook.early_signals.map(
+                      (item, index) => (
+                        <li key={index} className="flex gap-2 items-start">
+                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-amber-500" />
+                          <span>{item}</span>
+                        </li>
+                      )
+                    )}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    No signals yet.
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
       {/* Unique Value Proposition - Full Width Banner */}
       {!isDecember && (
         <section className="mb-8">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600 p-12 shadow-2xl">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#40b0bf] via-[#d2a64e] to-[#04d27f] p-12 shadow-2xl">
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
             <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/10 rounded-full blur-3xl" />

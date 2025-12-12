@@ -19,7 +19,7 @@ interface SocialMediaReachPieChartProps {
   data: PlatformData[];
 }
 
-const COLORS = ["#a855f7", "#ec4899", "#06b6d4", "#8b5cf6"];
+const COLORS = ["#40b0bf", "#d2a64e", "#04d27f", "#40b0bf"];
 
 export default function SocialMediaReachPieChart({
   data,

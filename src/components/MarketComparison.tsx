@@ -28,11 +28,11 @@ export default function MarketComparison({ data }: MarketComparisonProps) {
       
       <div className="grid md:grid-cols-2 gap-6">
         {/* Magic Worlds */}
-        <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-cyan-500/10 p-6 border-2 border-purple-500/20">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-transparent rounded-full blur-3xl" />
+        <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-[#40b0bf]/10 via-[#d2a64e]/10 to-[#04d27f]/10 p-6 border-2 border-[#40b0bf]/20">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#40b0bf]/20 to-transparent rounded-full blur-3xl" />
           
           <div className="relative z-10">
-            <h4 className="text-lg font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600 bg-clip-text text-transparent mb-4">
+            <h4 className="text-lg font-bold bg-gradient-to-r from-[#40b0bf] via-[#d2a64e] to-[#04d27f] bg-clip-text text-transparent mb-4">
               Magic Worlds
             </h4>
             

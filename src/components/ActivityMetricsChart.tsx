@@ -28,8 +28,8 @@ export default function ActivityMetricsChart({
         <AreaChart data={data}>
           <defs>
             <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#a855f7" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.1} />
+              <stop offset="5%" stopColor="#40b0bf" stopOpacity={0.8} />
+              <stop offset="95%" stopColor="#04d27f" stopOpacity={0.1} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
@@ -50,7 +50,7 @@ export default function ActivityMetricsChart({
           <Area
             type="monotone"
             dataKey="value"
-            stroke="#a855f7"
+            stroke="#40b0bf"
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#colorValue)"

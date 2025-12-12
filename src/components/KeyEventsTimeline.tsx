@@ -15,12 +15,12 @@ export default function KeyEventsTimeline({ events }: KeyEventsTimelineProps) {
           <div key={index} className="flex gap-4 items-start group">
             {/* Timeline Dot */}
             <div className="flex-shrink-0 mt-1">
-              <div className="w-3 h-3 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-cyan-500 shadow-lg shadow-purple-500/30 group-hover:scale-125 transition-transform duration-300" />
+              <div className="w-3 h-3 rounded-full bg-gradient-to-br from-[#40b0bf] via-[#d2a64e] to-[#04d27f] shadow-lg shadow-[#40b0bf]/30 group-hover:scale-125 transition-transform duration-300" />
             </div>
             
             {/* Event Content */}
             <div className="flex-1 pb-4 border-l-2 border-zinc-200 dark:border-zinc-800 pl-4 -ml-[7px]">
-              <p className="text-sm text-zinc-700 dark:text-zinc-300 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-200">
+              <p className="text-sm text-zinc-700 dark:text-zinc-300 group-hover:text-[#40b0bf] dark:group-hover:text-[#40b0bf]/80 transition-colors duration-200">
                 {event}
               </p>
             </div>

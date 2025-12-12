@@ -19,7 +19,7 @@ export default function StrategicGoals({ goals }: StrategicGoalsProps) {
           >
             {/* Checkbox Icon */}
             <div className="flex-shrink-0 mt-0.5">
-              <div className="w-5 h-5 rounded border-2 border-purple-500 flex items-center justify-center group-hover:bg-purple-500 transition-colors duration-200">
+              <div className="w-5 h-5 rounded border-2 border-[#40b0bf] flex items-center justify-center group-hover:bg-[#40b0bf] transition-colors duration-200">
                 <svg
                   className="w-3 h-3 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                   fill="none"
@@ -37,7 +37,7 @@ export default function StrategicGoals({ goals }: StrategicGoalsProps) {
             </div>
             
             {/* Goal Text */}
-            <p className="flex-1 text-sm text-zinc-700 dark:text-zinc-300 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-200">
+            <p className="flex-1 text-sm text-zinc-700 dark:text-zinc-300 group-hover:text-[#40b0bf] dark:group-hover:text-[#40b0bf]/80 transition-colors duration-200">
               {goal}
             </p>
           </div>
