@@ -1782,7 +1782,7 @@ export default function Home() {
 
           {/* Conclusion */}
           <section className="mb-16">
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#40b0bf] p-12 shadow-2xl">
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#40b0bf] p-6 md:p-12 shadow-2xl">
               {/* Grid Pattern Background */}
               <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
 
