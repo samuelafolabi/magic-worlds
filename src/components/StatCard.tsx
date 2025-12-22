@@ -2,7 +2,7 @@ import React from "react";
 
 interface StatCardProps {
   label: string;
-  value: string | number;
+  value: React.ReactNode;
   description?: string;
   trend?: string;
   icon?: React.ReactNode;
@@ -19,7 +19,7 @@ export default function StatCard({
     <div className="group relative overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
       {/* Gradient Background Effect */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#40b0bf]/5 via-[#d2a64e]/5 to-[#04d27f]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      
+
       <div className="relative z-10">
         {/* Header with Icon */}
         <div className="flex items-start justify-between mb-4">
