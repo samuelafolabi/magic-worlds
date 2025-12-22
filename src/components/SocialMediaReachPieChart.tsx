@@ -5,6 +5,7 @@ import {
   Cell,
   ResponsiveContainer,
   Tooltip,
+  type TooltipProps,
   Legend,
 } from "recharts";
 
@@ -21,6 +22,83 @@ interface SocialMediaReachPieChartProps {
 
 const COLORS = ["#40b0bf", "#d2a64e", "#04d27f", "#40b0bf"];
 
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object"
+    ? (value as Record<string, unknown>)
+    : {};
+}
+
+function SocialMediaReachTooltip({
+  active,
+  payload,
+}: TooltipProps<number, string>) {
+  if (!active || !payload || payload.length === 0) return null;
+  const item = payload[0] as unknown;
+  const itemRec = asRecord(item);
+  const name = typeof itemRec.name === "string" ? itemRec.name : "";
+  const value = typeof itemRec.value === "number" ? itemRec.value : 0;
+  const percent = (() => {
+    const p = asRecord(itemRec.payload);
+    return typeof p.percent === "number" ? p.percent : 0;
+  })();
+
+  return (
+    <div className="bg-zinc-900 dark:bg-zinc-800 border border-zinc-700 rounded-lg p-3 shadow-lg">
+      <p className="text-white font-semibold">{name}</p>
+      <p className="text-white">
+        <span className="text-zinc-400">Reach: </span>
+        {Number(value).toLocaleString()}
+      </p>
+      <p className="text-zinc-400 text-sm mt-1">
+        {(Number(percent) * 100).toFixed(1)}% of total
+      </p>
+    </div>
+  );
+}
+
+function renderReachLabel(props: unknown) {
+  const p = asRecord(props);
+  const cx = typeof p.cx === "number" ? p.cx : NaN;
+  const cy = typeof p.cy === "number" ? p.cy : NaN;
+  const midAngle = typeof p.midAngle === "number" ? p.midAngle : NaN;
+  const innerRadius = typeof p.innerRadius === "number" ? p.innerRadius : NaN;
+  const outerRadius = typeof p.outerRadius === "number" ? p.outerRadius : NaN;
+  const percent = typeof p.percent === "number" ? p.percent : 0;
+
+  if (
+    !Number.isFinite(cx) ||
+    !Number.isFinite(cy) ||
+    !Number.isFinite(midAngle) ||
+    !Number.isFinite(innerRadius) ||
+    !Number.isFinite(outerRadius)
+  ) {
+    return null;
+  }
+
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  // Only show label if segment is large enough (>5%)
+  if (percent < 0.05) return null;
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="#ffffff"
+      textAnchor={x > cx ? "start" : "end"}
+      dominantBaseline="central"
+      fontSize={14}
+      fontWeight="600"
+      style={{ textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}
+    >
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+}
+
 export default function SocialMediaReachPieChart({
   data,
 }: SocialMediaReachPieChartProps) {
@@ -36,58 +114,6 @@ export default function SocialMediaReachPieChart({
     })
     .filter((item) => item.value > 0); // Filter out platforms with no reach data
 
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0];
-      return (
-        <div className="bg-zinc-900 dark:bg-zinc-800 border border-zinc-700 rounded-lg p-3 shadow-lg">
-          <p className="text-white font-semibold">{data.name}</p>
-          <p className="text-white">
-            <span className="text-zinc-400">Reach: </span>
-            {data.value.toLocaleString()}
-          </p>
-          <p className="text-zinc-400 text-sm mt-1">
-            {((data.payload.percent || 0) * 100).toFixed(1)}% of total
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
-
-  const renderCustomLabel = ({
-    cx,
-    cy,
-    midAngle,
-    innerRadius,
-    outerRadius,
-    percent,
-    name,
-  }: any) => {
-    const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-    // Only show label if segment is large enough (>5%)
-    if (percent < 0.05) return null;
-
-    return (
-      <text
-        x={x}
-        y={y}
-        fill="#ffffff"
-        textAnchor={x > cx ? "start" : "end"}
-        dominantBaseline="central"
-        fontSize={14}
-        fontWeight="600"
-        style={{ textShadow: "0 1px 2px rgba(0,0,0,0.5)" }}
-      >
-        {`${(percent * 100).toFixed(0)}%`}
-      </text>
-    );
-  };
-
   return (
     <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 p-6 shadow-lg">
       <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-6 capitalize">
@@ -100,7 +126,7 @@ export default function SocialMediaReachPieChart({
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={renderCustomLabel}
+            label={renderReachLabel}
             outerRadius={100}
             fill="#8884d8"
             dataKey="value"
@@ -114,7 +140,7 @@ export default function SocialMediaReachPieChart({
               />
             ))}
           </Pie>
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<SocialMediaReachTooltip />} />
           <Legend
             verticalAlign="bottom"
             height={36}

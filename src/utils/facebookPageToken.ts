@@ -9,6 +9,12 @@ type MeAccountsResponse = {
   error?: unknown;
 };
 
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object"
+    ? (value as Record<string, unknown>)
+    : {};
+}
+
 let cached: { pageId: string; token: string; fetchedAtMs: number } | null =
   null;
 
@@ -83,10 +89,11 @@ export async function getFacebookPageAccessToken(opts: {
   const json = (await resp.json()) as MeAccountsResponse;
 
   if (!resp.ok) {
-    const fbErr: any = (json as any)?.error;
+    const fbErr = asRecord(json).error;
+    const fbErrMessage =
+      typeof asRecord(fbErr).message === "string" ? asRecord(fbErr).message : "";
     const message =
-      fbErr?.message ||
-      `Failed to fetch /me/accounts: ${resp.status} ${resp.statusText}`;
+      fbErrMessage || `Failed to fetch /me/accounts: ${resp.status} ${resp.statusText}`;
     throw new Error(message);
   }
 

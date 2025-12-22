@@ -313,7 +313,7 @@ export default function Home() {
     : baseReportData;
 
   const [decemberSocialPlatforms, setDecemberSocialPlatforms] = useState<
-    SocialPlatform[] | null
+    Array<SocialPlatform | null> | null
   >(null);
   const [decemberSocialLoading, setDecemberSocialLoading] = useState(false);
   const [decemberSocialError, setDecemberSocialError] = useState<string | null>(
@@ -338,7 +338,7 @@ export default function Home() {
           );
         }
         const platforms = Array.isArray(payload?.platforms)
-          ? (payload.platforms as SocialPlatform[])
+          ? (payload.platforms as Array<SocialPlatform | null>)
           : null;
         if (!cancelled) setDecemberSocialPlatforms(platforms);
       } catch (e) {
@@ -443,12 +443,16 @@ export default function Home() {
 
   const performancePlatforms =
     isDecember && decemberSocialPlatforms
-      ? decemberSocialPlatforms
+      ? decemberSocialPlatforms.filter(
+          (p): p is SocialPlatform => Boolean(p)
+        )
       : reportData.social_media_performance.platforms;
 
   const overallSocialGrowth =
     isDecember && decemberSocialPlatforms
-      ? computeOverallSocialGrowth(decemberSocialPlatforms)
+      ? computeOverallSocialGrowth(
+          decemberSocialPlatforms.filter((p): p is SocialPlatform => Boolean(p))
+        )
       : null;
 
   // Prepare social media data for chart

@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react";
 import Head from "next/head";
 import Image from "next/image";
+import Link from "next/link";
 import CursorTrail from "@/components/CursorTrail";
 
 interface MainLayoutProps {
@@ -164,12 +165,12 @@ export default function MainLayout({
                     </a>
                   </li>
                   <li>
-                    <a
+                    <Link
                       href="/"
                       className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-[#40b0bf] dark:hover:text-[#40b0bf]/80 transition-colors duration-200"
                     >
                       Dashboard
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>

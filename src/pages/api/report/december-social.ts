@@ -8,10 +8,16 @@ type SocialPlatform =
 type DecemberSocialResponse = {
   window: { since: string; until: string };
   generatedAt: string;
-  platforms: SocialPlatform[];
+  platforms: Array<SocialPlatform | null>;
 };
 
 type ErrorResponse = { error: string; details?: unknown };
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object"
+    ? (value as Record<string, unknown>)
+    : {};
+}
 
 function toNumber(value: unknown): number {
   if (typeof value === "number") return value;
@@ -36,10 +42,51 @@ function clampNonNegativeRound2(value: number): number {
 }
 
 function getBaseUrl(req: NextApiRequest): string {
+  // In Vercel, prefer the canonical deployment URL (avoids protocol/host ambiguity).
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+
   const protoHeader = req.headers["x-forwarded-proto"];
   const proto = Array.isArray(protoHeader) ? protoHeader[0] : protoHeader;
   const host = req.headers.host;
   return `${proto || "http"}://${host}`;
+}
+
+type FetchJsonResult<T> = {
+  resp: Response;
+  json: T | null;
+  contentType: string;
+  textPreview: string;
+};
+
+async function fetchJsonFromInternal<T>(
+  req: NextApiRequest,
+  url: string,
+  init?: RequestInit
+): Promise<FetchJsonResult<T>> {
+  // Forward cookies so deployment protection/auth middleware doesn't return HTML.
+  const cookie = req.headers.cookie;
+  const resp = await fetch(url, {
+    ...init,
+    headers: {
+      ...(cookie ? { cookie } : {}),
+      ...(init?.headers || {}),
+    },
+  });
+
+  const contentType = resp.headers.get("content-type") || "";
+  const text = await resp.text();
+  const textPreview = text.slice(0, 200);
+
+  // If we don't get JSON, let callers decide whether to treat it as fatal.
+  if (!contentType.toLowerCase().includes("application/json")) {
+    return { resp, json: null, contentType, textPreview };
+  }
+
+  try {
+    return { resp, json: JSON.parse(text) as T, contentType, textPreview };
+  } catch {
+    return { resp, json: null, contentType, textPreview };
+  }
 }
 
 async function resolveFacebookPageToken(pageId: string): Promise<string> {
@@ -106,7 +153,12 @@ async function fetchMetaMetricSum(opts: {
   url.searchParams.set("access_token", opts.accessToken);
 
   const resp = await fetch(url.toString());
-  const json = (await resp.json()) as InsightMetricResponse;
+  const contentType = resp.headers.get("content-type") || "";
+  const text = await resp.text();
+  const json =
+    contentType.toLowerCase().includes("application/json") && text.length > 0
+      ? (JSON.parse(text) as InsightMetricResponse)
+      : ({} as InsightMetricResponse);
 
   if (!resp.ok) return null;
   const first = Array.isArray(json.data) ? json.data[0] : undefined;
@@ -152,7 +204,7 @@ function getBaselinePlatform(name: SocialPlatform["platform"]): SocialPlatform {
       handle: "",
       followers: 0,
       growth_percentage: 0,
-    } as any;
+    } as unknown as SocialPlatform;
   }
   return baseline as SocialPlatform;
 }
@@ -188,180 +240,293 @@ export default async function handler(
 
   try {
     const pageId = process.env.FACEBOOK_PAGE_ID || "154572707991531";
-    const pageToken = await resolveFacebookPageToken(pageId);
 
-    // ----- Facebook (21-day window for views/viewers/visits; current followers via /api/facebook/page)
-    const fbBaseline = getBaselinePlatform("Facebook");
+    // Resolve Meta credentials once; if this fails, FB/IG become null but others still work.
+    const metaCreds: { pageId: string; pageToken: string } | null =
+      await (async () => {
+        const pageToken = await resolveFacebookPageToken(pageId);
+        return { pageId, pageToken };
+      })().catch((e) => {
+        console.error(
+          "[december-social] Failed to resolve Meta credentials",
+          e
+        );
+        return null;
+      });
 
-    const fbPageResp = await fetch(`${baseUrl}/api/facebook/page`);
-    const fbPageJson = await fbPageResp.json();
-    const fbFollowers = fbPageResp.ok
-      ? toNumber((fbPageJson as any)?.followers)
-      : null;
+    const facebook: SocialPlatform | null = await (async () => {
+      try {
+        if (!metaCreds) return null;
+        const { pageToken } = metaCreds;
 
-    const fbViews = await fetchMetaMetricSum({
-      objectId: pageId,
-      metric: "page_views_total",
-      sinceUnix,
-      untilUnixExclusive,
-      accessToken: pageToken,
-    });
-    const fbViewers = await fetchMetaMetricSum({
-      objectId: pageId,
-      metric: "page_impressions_unique",
-      sinceUnix,
-      untilUnixExclusive,
-      accessToken: pageToken,
-    });
-    const fbVisits = await fetchMetaMetricSum({
-      objectId: pageId,
-      metric: "page_views_logged_in_total",
-      sinceUnix,
-      untilUnixExclusive,
-      accessToken: pageToken,
-    });
+        // ----- Facebook (views/viewers/visits; followers via internal API)
+        const fbBaseline = getBaselinePlatform("Facebook");
 
-    const fbViewsBaseline = toNumber((fbBaseline as any)?.views);
-    const fbViewersBaseline = toNumber((fbBaseline as any)?.viewers);
-    const fbVisitsBaseline = toNumber((fbBaseline as any)?.visits);
+        const fbPage = await fetchJsonFromInternal<unknown>(
+          req,
+          `${baseUrl}/api/facebook/page`
+        );
+        if (
+          fbPage.resp.ok &&
+          fbPage.json === null &&
+          !fbPage.contentType.toLowerCase().includes("application/json")
+        ) {
+          throw new Error(
+            `Facebook internal route returned non-JSON: ${fbPage.contentType} body="${fbPage.textPreview}"`
+          );
+        }
+        const fbFollowers =
+          fbPage.resp.ok && fbPage.json
+            ? toNumber(asRecord(fbPage.json).followers)
+            : null;
 
-    const fbViewsEffective = fbViews ?? fbViewsBaseline;
-    const fbViewersEffective = fbViewers ?? fbViewersBaseline;
-    const fbVisitsEffective = fbVisits ?? fbVisitsBaseline;
+        const fbViews = await fetchMetaMetricSum({
+          objectId: pageId,
+          metric: "page_views_total",
+          sinceUnix,
+          untilUnixExclusive,
+          accessToken: pageToken,
+        });
+        const fbViewers = await fetchMetaMetricSum({
+          objectId: pageId,
+          metric: "page_impressions_unique",
+          sinceUnix,
+          untilUnixExclusive,
+          accessToken: pageToken,
+        });
+        const fbVisits = await fetchMetaMetricSum({
+          objectId: pageId,
+          metric: "page_views_logged_in_total",
+          sinceUnix,
+          untilUnixExclusive,
+          accessToken: pageToken,
+        });
 
-    const fbViewsGrowth = clampNonNegativeRound2(
-      pctChange(fbViewsEffective, fbViewsBaseline)
-    );
-    const fbViewersGrowth = clampNonNegativeRound2(
-      pctChange(fbViewersEffective, fbViewersBaseline)
-    );
-    const fbVisitGrowth = clampNonNegativeRound2(
-      pctChange(fbVisitsEffective, fbVisitsBaseline)
-    );
+        const fbViewsBaseline = toNumber(asRecord(fbBaseline).views);
+        const fbViewersBaseline = toNumber(asRecord(fbBaseline).viewers);
+        const fbVisitsBaseline = toNumber(asRecord(fbBaseline).visits);
 
-    const facebook: SocialPlatform = {
-      ...(fbBaseline as any),
-      followers: fbFollowers ?? toNumber((fbBaseline as any)?.followers),
-      views: fbViewsEffective,
-      viewers: fbViewersEffective,
-      visits: fbVisitsEffective,
-      growth_percentage: fbViewsGrowth,
-      views_growth: fbViewsGrowth,
-      viewers_growth: fbViewersGrowth,
-      visit_growth: fbVisitGrowth,
-    } as any;
+        const fbViewsEffective = fbViews ?? fbViewsBaseline;
+        const fbViewersEffective = fbViewers ?? fbViewersBaseline;
+        const fbVisitsEffective = fbVisits ?? fbVisitsBaseline;
 
-    // ----- Instagram (21-day window for reach/views/visits; current followers via /api/instagram/profile)
-    const igBaseline = getBaselinePlatform("Instagram");
-    const igProfileResp = await fetch(`${baseUrl}/api/instagram/profile`);
-    const igProfileJson = await igProfileResp.json();
-    const igFollowers = igProfileResp.ok
-      ? toNumber((igProfileJson as any)?.followers)
-      : null;
+        const fbViewsGrowth = clampNonNegativeRound2(
+          pctChange(fbViewsEffective, fbViewsBaseline)
+        );
+        const fbViewersGrowth = clampNonNegativeRound2(
+          pctChange(fbViewersEffective, fbViewersBaseline)
+        );
+        const fbVisitGrowth = clampNonNegativeRound2(
+          pctChange(fbVisitsEffective, fbVisitsBaseline)
+        );
 
-    const igUserId = await getInstagramBusinessUserId({ pageId, pageToken });
+        return {
+          ...fbBaseline,
+          followers: fbFollowers ?? toNumber(asRecord(fbBaseline).followers),
+          views: fbViewsEffective,
+          viewers: fbViewersEffective,
+          visits: fbVisitsEffective,
+          growth_percentage: fbViewsGrowth,
+          views_growth: fbViewsGrowth,
+          viewers_growth: fbViewersGrowth,
+          visit_growth: fbVisitGrowth,
+        } as unknown as SocialPlatform;
+      } catch (e) {
+        console.error("[december-social] Facebook build failed", e);
+        return null;
+      }
+    })();
 
-    const igReach = await fetchMetaMetricSum({
-      objectId: igUserId,
-      metric: "reach",
-      sinceUnix,
-      untilUnixExclusive,
-      accessToken: pageToken,
-    });
-    const igImpressions = await fetchMetaMetricSum({
-      objectId: igUserId,
-      metric: "impressions",
-      sinceUnix,
-      untilUnixExclusive,
-      accessToken: pageToken,
-    });
-    const igProfileViews = await fetchMetaMetricSum({
-      objectId: igUserId,
-      metric: "profile_views",
-      sinceUnix,
-      untilUnixExclusive,
-      accessToken: pageToken,
-    });
+    const instagram: SocialPlatform | null = await (async () => {
+      try {
+        if (!metaCreds) return null;
+        const { pageToken } = metaCreds;
 
-    const igReachBaseline = toNumber((igBaseline as any)?.reach);
-    const igViewsBaseline = toNumber((igBaseline as any)?.views);
-    const igVisitsBaseline = toNumber((igBaseline as any)?.visits);
+        // ----- Instagram (reach/views/visits; followers via internal API)
+        const igBaseline = getBaselinePlatform("Instagram");
 
-    const igReachEffective = igReach ?? igReachBaseline;
-    const igViewsEffective = igImpressions ?? igViewsBaseline;
-    const igVisitsEffective = igProfileViews ?? igVisitsBaseline;
+        const igProfile = await fetchJsonFromInternal<unknown>(
+          req,
+          `${baseUrl}/api/instagram/profile`
+        );
+        if (
+          igProfile.resp.ok &&
+          igProfile.json === null &&
+          !igProfile.contentType.toLowerCase().includes("application/json")
+        ) {
+          throw new Error(
+            `Instagram internal route returned non-JSON: ${igProfile.contentType} body="${igProfile.textPreview}"`
+          );
+        }
 
-    const igReachGrowth = clampNonNegativeRound2(
-      pctChange(igReachEffective, igReachBaseline)
-    );
-    const igViewsGrowth = clampNonNegativeRound2(
-      pctChange(igViewsEffective, igViewsBaseline)
-    );
-    const igVisitGrowth = clampNonNegativeRound2(
-      pctChange(igVisitsEffective, igVisitsBaseline)
-    );
+        const igFollowers =
+          igProfile.resp.ok && igProfile.json
+            ? toNumber(asRecord(igProfile.json).followers)
+            : null;
 
-    const instagram: SocialPlatform = {
-      ...(igBaseline as any),
-      followers: igFollowers ?? toNumber((igBaseline as any)?.followers),
-      reach: igReachEffective,
-      views: igViewsEffective,
-      visits: igVisitsEffective,
-      // Per requirement: Instagram growth is based on Reach vs Nov baseline
-      growth_percentage: igReachGrowth,
-      reach_growth: igReachGrowth,
-      views_growth: igViewsGrowth,
-      visit_growth: igVisitGrowth,
-      description:
-        "Instagram is our visual front door—short updates, highlights, and community moments that keep the brand present day-to-day.",
-    } as any;
+        const igUserId = await getInstagramBusinessUserId({
+          pageId,
+          pageToken,
+        });
 
-    // ----- YouTube (current totals; growth vs Nov baseline total views)
-    const ytBaseline = getBaselinePlatform("YouTube");
-    const ytResp = await fetch(
-      `${baseUrl}/api/youtube/channel?handle=MagicworldsTV`
-    );
-    const ytJson = await ytResp.json();
-    const ytViews = ytResp.ok ? toNumber((ytJson as any)?.views) : null;
-    const ytSubs = ytResp.ok ? toNumber((ytJson as any)?.subscribers) : null;
-    const ytVideos = ytResp.ok ? toNumber((ytJson as any)?.videos) : null;
+        const igReach = await fetchMetaMetricSum({
+          objectId: igUserId,
+          metric: "reach",
+          sinceUnix,
+          untilUnixExclusive,
+          accessToken: pageToken,
+        });
+        const igImpressions = await fetchMetaMetricSum({
+          objectId: igUserId,
+          metric: "impressions",
+          sinceUnix,
+          untilUnixExclusive,
+          accessToken: pageToken,
+        });
+        const igProfileViews = await fetchMetaMetricSum({
+          objectId: igUserId,
+          metric: "profile_views",
+          sinceUnix,
+          untilUnixExclusive,
+          accessToken: pageToken,
+        });
 
-    const ytViewsGrowth = clampNonNegativeRound2(
-      pctChange(ytViews, toNumber((ytBaseline as any)?.views))
-    );
+        const igReachBaseline = toNumber(asRecord(igBaseline).reach);
+        const igViewsBaseline = toNumber(asRecord(igBaseline).views);
+        const igVisitsBaseline = toNumber(asRecord(igBaseline).visits);
 
-    const youtube: SocialPlatform = {
-      ...(ytBaseline as any),
-      followers: ytSubs ?? toNumber((ytBaseline as any)?.followers),
-      views: ytViews ?? toNumber((ytBaseline as any)?.views),
-      videos: ytVideos ?? (ytBaseline as any)?.videos,
-      growth_percentage: ytViewsGrowth,
-      views_growth: ytViewsGrowth,
-      description:
-        "YouTube is seeing explosive growth—views are accelerating fast as more high-volume content lands and discovery keeps compounding.",
-    } as any;
+        const igReachEffective = igReach ?? igReachBaseline;
+        const igViewsEffective = igImpressions ?? igViewsBaseline;
+        const igVisitsEffective = igProfileViews ?? igVisitsBaseline;
 
-    // ----- X (Twitter) (current totals; growth vs Nov baseline followers)
-    const xBaseline = getBaselinePlatform("X (Twitter)");
-    const xResp = await fetch(`${baseUrl}/api/x/users/me`);
-    const xJson = await xResp.json();
-    const xFollowers = xResp.ok
-      ? toNumber((xJson as any)?.data?.public_metrics?.followers_count)
-      : null;
-    const xPosts = xResp.ok
-      ? toNumber((xJson as any)?.data?.public_metrics?.tweet_count)
-      : null;
+        const igReachGrowth = clampNonNegativeRound2(
+          pctChange(igReachEffective, igReachBaseline)
+        );
+        const igViewsGrowth = clampNonNegativeRound2(
+          pctChange(igViewsEffective, igViewsBaseline)
+        );
+        const igVisitGrowth = clampNonNegativeRound2(
+          pctChange(igVisitsEffective, igVisitsBaseline)
+        );
 
-    const xGrowth = clampNonNegativeRound2(
-      pctChange(xFollowers, toNumber((xBaseline as any)?.followers))
-    );
+        return {
+          ...igBaseline,
+          followers: igFollowers ?? toNumber(asRecord(igBaseline).followers),
+          reach: igReachEffective,
+          views: igViewsEffective,
+          visits: igVisitsEffective,
+          // Per requirement: Instagram growth is based on Reach vs Nov baseline
+          growth_percentage: igReachGrowth,
+          reach_growth: igReachGrowth,
+          views_growth: igViewsGrowth,
+          visit_growth: igVisitGrowth,
+          description:
+            "Instagram is our visual front door—short updates, highlights, and community moments that keep the brand present day-to-day.",
+        } as unknown as SocialPlatform;
+      } catch (e) {
+        console.error("[december-social] Instagram build failed", e);
+        return null;
+      }
+    })();
 
-    const xTwitter: SocialPlatform = {
-      ...(xBaseline as any),
-      followers: xFollowers ?? toNumber((xBaseline as any)?.followers),
-      posts: xPosts ?? (xBaseline as any)?.posts,
-      growth_percentage: xGrowth,
-    } as any;
+    const youtube: SocialPlatform | null = await (async () => {
+      try {
+        // ----- YouTube (current totals; growth vs Nov baseline total views)
+        const ytBaseline = getBaselinePlatform("YouTube");
+        const yt = await fetchJsonFromInternal<unknown>(
+          req,
+          `${baseUrl}/api/youtube/channel?handle=MagicworldsTV`
+        );
+
+        // If we got HTML, treat this platform as failed (likely protection / routing issue).
+        if (
+          yt.resp.ok &&
+          yt.json === null &&
+          !yt.contentType.toLowerCase().includes("application/json")
+        ) {
+          throw new Error(
+            `YouTube internal route returned non-JSON: ${yt.contentType} body="${yt.textPreview}"`
+          );
+        }
+
+        const ytViews =
+          yt.resp.ok && yt.json ? toNumber(asRecord(yt.json).views) : null;
+        const ytSubs =
+          yt.resp.ok && yt.json
+            ? toNumber(asRecord(yt.json).subscribers)
+            : null;
+        const ytVideos =
+          yt.resp.ok && yt.json ? toNumber(asRecord(yt.json).videos) : null;
+
+        const ytViewsGrowth = clampNonNegativeRound2(
+          pctChange(ytViews, toNumber(asRecord(ytBaseline).views))
+        );
+
+        return {
+          ...ytBaseline,
+          followers: ytSubs ?? toNumber(asRecord(ytBaseline).followers),
+          views: ytViews ?? toNumber(asRecord(ytBaseline).views),
+          videos: ytVideos ?? asRecord(ytBaseline).videos,
+          growth_percentage: ytViewsGrowth,
+          views_growth: ytViewsGrowth,
+          description:
+            "YouTube is seeing explosive growth—views are accelerating fast as more high-volume content lands and discovery keeps compounding.",
+        } as unknown as SocialPlatform;
+      } catch (e) {
+        console.error("[december-social] YouTube build failed", e);
+        return null;
+      }
+    })();
+
+    const xTwitter: SocialPlatform | null = await (async () => {
+      try {
+        // ----- X (Twitter) (current totals; growth vs Nov baseline followers)
+        const xBaseline = getBaselinePlatform("X (Twitter)");
+        const x = await fetchJsonFromInternal<unknown>(
+          req,
+          `${baseUrl}/api/x/users/me`
+        );
+
+        if (
+          x.resp.ok &&
+          x.json === null &&
+          !x.contentType.toLowerCase().includes("application/json")
+        ) {
+          throw new Error(
+            `X internal route returned non-JSON: ${x.contentType} body="${x.textPreview}"`
+          );
+        }
+
+        const xFollowers =
+          x.resp.ok && x.json
+            ? toNumber(
+                asRecord(asRecord(asRecord(x.json).data).public_metrics)
+                  .followers_count
+              )
+            : null;
+        const xPosts =
+          x.resp.ok && x.json
+            ? toNumber(
+                asRecord(asRecord(asRecord(x.json).data).public_metrics)
+                  .tweet_count
+              )
+            : null;
+
+        const xGrowth = clampNonNegativeRound2(
+          pctChange(xFollowers, toNumber(asRecord(xBaseline).followers))
+        );
+
+        return {
+          ...xBaseline,
+          followers: xFollowers ?? toNumber(asRecord(xBaseline).followers),
+          posts: xPosts ?? asRecord(xBaseline).posts,
+          growth_percentage: xGrowth,
+        } as unknown as SocialPlatform;
+      } catch (e) {
+        console.error("[december-social] X build failed", e);
+        return null;
+      }
+    })();
 
     const payload: DecemberSocialResponse = {
       window,

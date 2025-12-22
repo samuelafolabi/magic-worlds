@@ -39,6 +39,12 @@ interface ErrorResponse {
   details?: unknown;
 }
 
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object"
+    ? (value as Record<string, unknown>)
+    : {};
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<InsightsResponse | ErrorResponse>
@@ -378,12 +384,11 @@ export default async function handler(
                 body: json,
               };
 
+              const err = asRecord(asRecord(json).error);
+              const errMsg =
+                typeof err.message === "string" ? err.message : undefined;
               const message =
-                (json &&
-                  typeof json === "object" &&
-                  (json as any).error &&
-                  typeof (json as any).error.message === "string" &&
-                  (json as any).error.message) ||
+                errMsg ||
                 `HTTP ${response.status} ${response.statusText}`;
 
               unsupported[`${metric} (${period})`] = message;
@@ -402,8 +407,7 @@ export default async function handler(
                 ? getLatestValue(insight)
                 : sumInsightValues(insight);
 
-            // Type assertion needed because TypeScript can't narrow plan.field
-            (shaped as any)[plan.field] = value;
+            shaped[plan.field] = value;
             successCount += 1;
             fieldSucceeded = true;
             break;
@@ -440,12 +444,11 @@ export default async function handler(
                 body: json,
               };
 
+              const err = asRecord(asRecord(json).error);
+              const errMsg =
+                typeof err.message === "string" ? err.message : undefined;
               const message =
-                (json &&
-                  typeof json === "object" &&
-                  (json as any).error &&
-                  typeof (json as any).error.message === "string" &&
-                  (json as any).error.message) ||
+                errMsg ||
                 `HTTP ${response.status} ${response.statusText}`;
 
               unsupported[`${metric} (${period})`] = message;

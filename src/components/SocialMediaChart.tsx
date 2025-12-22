@@ -6,6 +6,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  type TooltipProps,
   ResponsiveContainer,
   Cell,
 } from "recharts";
@@ -19,6 +20,36 @@ interface SocialMediaChartProps {
 }
 
 const COLORS = ["#40b0bf", "#d2a64e", "#04d27f", "#40b0bf"];
+
+type SocialMediaGrowthDatum = {
+  platform: string;
+  growth_percentage: number;
+  followers: number;
+  displayValue?: number;
+  isCapped?: boolean;
+};
+
+function SocialMediaGrowthTooltip({
+  active,
+  payload,
+}: TooltipProps<number, string>) {
+  if (!active || !payload || payload.length === 0) return null;
+  const datum = payload[0]?.payload as unknown as SocialMediaGrowthDatum;
+  if (!datum) return null;
+
+  return (
+    <div className="bg-zinc-900 dark:bg-zinc-800 border border-zinc-700 rounded-lg p-3 shadow-lg">
+      <p className="text-white font-semibold">{datum.platform}</p>
+      <p className="text-white">
+        <span className="text-zinc-400">Growth: </span>
+        {Number(datum.growth_percentage).toLocaleString()}%
+        {datum.isCapped && (
+          <span className="text-yellow-400 text-sm ml-2">(off-scale)</span>
+        )}
+      </p>
+    </div>
+  );
+}
 
 export default function SocialMediaChart({ data }: SocialMediaChartProps) {
   // Find the max value excluding Instagram (which has 7300% growth)
@@ -39,25 +70,6 @@ export default function SocialMediaChart({ data }: SocialMediaChartProps) {
     isCapped: item.growth_percentage > 1000,
   }));
 
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-zinc-900 dark:bg-zinc-800 border border-zinc-700 rounded-lg p-3 shadow-lg">
-          <p className="text-white font-semibold">{data.platform}</p>
-          <p className="text-white">
-            <span className="text-zinc-400">Growth: </span>
-            {data.growth_percentage.toLocaleString()}%
-            {data.isCapped && (
-              <span className="text-yellow-400 text-sm ml-2">(off-scale)</span>
-            )}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
-
   return (
     <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/50 p-6 shadow-lg">
       <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-6 capitalize">
@@ -77,7 +89,7 @@ export default function SocialMediaChart({ data }: SocialMediaChartProps) {
             domain={yAxisDomain}
             tickFormatter={(value) => `${value}%`}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<SocialMediaGrowthTooltip />} />
           <Bar dataKey="displayValue" radius={[8, 8, 0, 0]}>
             {chartData.map((entry, index) => (
               <Cell
