@@ -182,7 +182,7 @@ export default async function handler(
     };
 
     type MetricPlan = {
-      field: keyof Omit<InsightsResponse, "raw" | "unsupported">;
+      field: "impressions" | "reach" | "engagedUsers" | "fans" | "pageViews";
       metricsToTry: string[];
       preferredPeriod: "day" | "lifetime";
       aggregate: "sum" | "latest";

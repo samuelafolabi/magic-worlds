@@ -5,7 +5,6 @@ import {
   Cell,
   ResponsiveContainer,
   Tooltip,
-  type TooltipProps,
   Legend,
 } from "recharts";
 
@@ -31,9 +30,14 @@ function asRecord(value: unknown): Record<string, unknown> {
 function SocialMediaReachTooltip({
   active,
   payload,
-}: TooltipProps<number, string>) {
-  if (!active || !payload || payload.length === 0) return null;
-  const item = payload[0] as unknown;
+}: {
+  active?: unknown;
+  payload?: unknown;
+}) {
+  const isActive = active === true;
+  const payloadArr = Array.isArray(payload) ? payload : [];
+  if (!isActive || payloadArr.length === 0) return null;
+  const item = payloadArr[0] as unknown;
   const itemRec = asRecord(item);
   const name = typeof itemRec.name === "string" ? itemRec.name : "";
   const value = typeof itemRec.value === "number" ? itemRec.value : 0;

@@ -6,7 +6,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  type TooltipProps,
   ResponsiveContainer,
   Cell,
 } from "recharts";
@@ -29,13 +28,26 @@ type SocialMediaGrowthDatum = {
   isCapped?: boolean;
 };
 
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object"
+    ? (value as Record<string, unknown>)
+    : {};
+}
+
 function SocialMediaGrowthTooltip({
   active,
   payload,
-}: TooltipProps<number, string>) {
-  if (!active || !payload || payload.length === 0) return null;
-  const datum = payload[0]?.payload as unknown as SocialMediaGrowthDatum;
-  if (!datum) return null;
+}: {
+  active?: unknown;
+  payload?: unknown;
+}) {
+  const isActive = active === true;
+  const payloadArr = Array.isArray(payload) ? payload : [];
+  if (!isActive || payloadArr.length === 0) return null;
+
+  const first = asRecord(payloadArr[0]);
+  const datum = asRecord(first.payload) as unknown as SocialMediaGrowthDatum;
+  if (!datum || typeof datum.platform !== "string") return null;
 
   return (
     <div className="bg-zinc-900 dark:bg-zinc-800 border border-zinc-700 rounded-lg p-3 shadow-lg">

@@ -90,8 +90,8 @@ export async function getFacebookPageAccessToken(opts: {
 
   if (!resp.ok) {
     const fbErr = asRecord(json).error;
-    const fbErrMessage =
-      typeof asRecord(fbErr).message === "string" ? asRecord(fbErr).message : "";
+    const fbErrRec = asRecord(fbErr);
+    const fbErrMessage = typeof fbErrRec.message === "string" ? fbErrRec.message : "";
     const message =
       fbErrMessage || `Failed to fetch /me/accounts: ${resp.status} ${resp.statusText}`;
     throw new Error(message);
